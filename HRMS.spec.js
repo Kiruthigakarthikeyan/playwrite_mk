@@ -8,7 +8,7 @@ test('Home page, footer links, and login validation', async ({ page }) => {
   await page.goto('https://desicrewdtrial.crystalhr.com/');
   await expect(page).toHaveTitle(/Employee Information Portal/i);
   await page.waitForLoadState('domcontentloaded');
-  console.log('🔹 Homepage loaded successfully.');
+  console.log(' Homepage loaded successfully.');
 
   // ---------------------------
   // Step 2: Footer links
@@ -17,7 +17,7 @@ test('Home page, footer links, and login validation', async ({ page }) => {
   const appleStoreImg = page.locator('img[alt="Get it on Apple Store"]');
 
   await expect(googlePlayLink).toBeVisible();
-  console.log('🔹 Google Play link visible');
+  console.log(' Google Play link visible');
   await googlePlayLink.click();
   await page.goto('https://desicrewdtrial.crystalhr.com/');
 
@@ -26,7 +26,7 @@ test('Home page, footer links, and login validation', async ({ page }) => {
   await appleStoreImg.click();
   await page.goto('https://desicrewdtrial.crystalhr.com/');
 
-  console.log('✅ Footer links validated successfully');
+  console.log(' Footer links validated successfully');
 
   // ---------------------------
   // Step 3: Login
@@ -36,5 +36,6 @@ test('Home page, footer links, and login validation', async ({ page }) => {
   await loginPage.login('dc3775', 'Keerthi@123');
   await loginPage.verifyLoginSuccess();
 
-  console.log('✅ Full homepage, footer links, and login validated successfully!');
+  console.log(' Full homepage, footer links, and login validated successfully!');
 });
+
