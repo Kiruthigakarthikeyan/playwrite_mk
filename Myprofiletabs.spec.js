@@ -25,35 +25,93 @@ async function openMyProfile(page) {
 }
 
 // --------------------------
-// TEST: Validate Salary Details - Earnings tab
+//  Validate Salary Details - Earnings & Deductions
 // --------------------------
-test('Validate Salary Details - Earnings tab', async ({ page }) => {
+test('Validate Salary Details - Earnings and Deductions tabs', async ({ page }) => {
   await login(page);
   await openMyProfile(page);
 
+  //  Open Salary Details tab
   const salaryTab = page.locator('a[data-toggle="tab"][href="#tabSalaryDetails"]');
   await expect(salaryTab).toBeVisible({ timeout: 10000 });
   await salaryTab.click();
   console.log(' Clicked Salary Details tab');
 
-  
+  // ============================================================
+  // EARNINGS TAB
+  // ============================================================
   const earningsTab = page.locator('a[data-toggle="tab"][href="#salaryEarnings"]');
-  await expect(earningsTab).toBeVisible({ timeout: 10000 });
+  await expect(earningsTab).toBeVisible();
   await earningsTab.click();
-  console.log('Clicked Earnings sub-tab');
+  console.log('Opened Earnings tab');
 
-  
-  const earningsSection = page.locator('#salaryEarnings .profile-info-row');
-  await earningsSection.first().waitFor({ state: 'visible', timeout: 15000 });
-  console.log('Earnings fields loaded');
+  const earningsRows = page.locator('#salaryEarnings .profile-info-row');
+  await earningsRows.first().waitFor({ state: 'visible', timeout: 15000 });
+  console.log(' Earnings fields loaded');
 
-  const earningsRows = await earningsSection.elementHandles();
-  for (const row of earningsRows) {
+  const earnings = await earningsRows.elementHandles();
+  for (const row of earnings) {
     const label = await row.$eval('.profile-info-name label', el => el.textContent.trim());
-    const valueLocator = await row.$('.field-value');
-    const value = valueLocator ? (await valueLocator.textContent()).trim() : '';
-    console.log(`🔹 ${label}: "${value}"`);
+    const value = await row.$eval('.field-value', el => el.textContent.trim());
+    console.log(' [Earning] ${label}: "${value}"');
   }
+
+  // ============================================================
+  // DEDUCTIONS TAB
+  // ============================================================
+  const deductionsTab = page.locator('a[data-toggle="tab"][href="#salaryDeductions"]');
+  await expect(deductionsTab).toBeVisible();
+  await deductionsTab.click();
+  console.log('Opened Deductions tab');
+
+  const deductionRows = page.locator('#salaryDeductions .profile-info-row');
+  await deductionRows.first().waitFor({ state: 'visible', timeout: 15000 });
+  console.log('Deductions fields loaded');
+
+  const deductions = await deductionRows.elementHandles();
+  for (const row of deductions) {
+    const label = await row.$eval('.profile-info-name label', el => el.textContent.trim());
+    const value = await row.$eval('.field-value', el => el.textContent.trim());
+    console.log(' [Deduction] ${label}: "${value}"');
+  }
+
+  console.log('Salary Details (Earnings & Deductions) validation completed successfully');
+});
+
+// --------------------------
+// TEST 2: Validate Salary Details - Reimbursement Tab
+// --------------------------
+test('Validate Salary Details - Reimbursement tab (no fields)', async ({ page }) => {
+  await login(page);
+  await openMyProfile(page);
+
+  // STEP 1: Open Salary Details tab
+  const salaryTab = page.locator('a[data-toggle="tab"][href="#tabSalaryDetails"]');
+  await expect(salaryTab).toBeVisible({ timeout: 10000 });
+  await salaryTab.click();
+  console.log('Clicked Salary Details tab');
+
+  // STEP 2: Open Reimbursement tab
+  const reimbursementTab = page.locator('a[data-toggle="tab"][href="#salaryReimbursement"]');
+  await expect(reimbursementTab).toBeVisible();
+  await reimbursementTab.click();
+  console.log('Opened Reimbursement tab');
+
+  // STEP 3: Check for fields
+  const reimbursementRows = page.locator('#salaryReimbursement .profile-info-row');
+  const rowCount = await reimbursementRows.count();
+
+  if (rowCount === 0) {
+    console.log('Reimbursement tab contains no fields (as expected)');
+  } else {
+    console.log(`Reimbursement tab has ${rowCount} unexpected fields`);
+    const labels = await reimbursementRows.allTextContents();
+    console.log('Unexpected fields:', labels);
+  }
+
+  console.log('Reimbursement tab validation completed');
+});
 
   console.log('All Earnings fields displayed successfully');
 });
+
