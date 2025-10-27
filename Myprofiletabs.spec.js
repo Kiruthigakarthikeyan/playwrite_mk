@@ -285,4 +285,165 @@ test('Academic Qualification: Delete all rows', async ({ page }) => {
 
   console.log('✅ All Academic Qualification rows deleted successfully');
 });
+// -------------------------------
+// TEST: Validate File Upload Flow
+// -------------------------------
+ test("Validate Documents Uploading file and canceling", async ({ page, context }) => {
+  // Enable screen recording
+  await context.tracing.start({ screenshots: true, snapshots: true });
+
+  await login(page);
+  await openMyProfile(page);
+
+  // Click Documents Upload tab
+  const docTab = page.locator('a[data-toggle="tab"][href="#tabDocumentUpload"]');
+  await expect(docTab).toBeVisible();
+  await docTab.click();
+  console.log("✅ Opened Documents Upload tab");
+
+  // Click Edit to enable upload
+  const editBtn = page.locator("#btnEdit");
+  await expect(editBtn).toBeVisible({ timeout: 10000 });
+  await editBtn.click();
+  console.log("✏️ Clicked Edit to enable upload");
+
+  // Handle Cancel flow
+  const uploadInput = page.locator('input[type="file"][multiple]');
+  const cancelBtn = page.locator('button#btnCancel');
+
+  // Make sure Cancel is visible before upload
+  await expect(cancelBtn).toBeVisible();
+  console.log("🚫 Cancel button visible before upload");
+
+  // Count files before cancel
+  const uploadedFileList = page.locator(".dz-filename span");
+  const initialCount = await uploadedFileList.count();
+  console.log(`📂 Files before cancel: ${initialCount}`);
+
+  // Click cancel
+  await cancelBtn.click();
+  console.log("🚪 Clicked Cancel - upload aborted");
+
+  // Ensure cancel didn’t add new files
+  const countAfterCancel = await uploadedFileList.count();
+  expect(countAfterCancel).toBe(initialCount);
+  console.log("✅ Cancel worked correctly — file count unchanged");
+
+  // Re-enter upload mode
+  await editBtn.click();
+  console.log("✏️ Re-entered edit mode for upload");
+
+  // Upload file
+  const filePath = path.resolve("tests/files/sample.pdf");
+  console.log(`📄 File selected for upload: ${filePath}`);
+  await uploadInput.setInputFiles(filePath);
+  console.log("📤 File uploaded via Dropzone input");
+
+  // Wait for preview
+  const uploadedFile = page.locator(".dz-filename span", { hasText: "sample.pdf" });
+  await expect(uploadedFile).toBeVisible({ timeout: 15000 });
+  console.log("✅ Uploaded file preview visible");
+
+  // Click Save
+  const saveBtn = page.locator("#btnSave");
+  await expect(saveBtn).toBeVisible();
+  await saveBtn.click();
+  console.log("💾 Clicked Save button to confirm upload");
+
+  // Validate upload persisted
+  await page.waitForTimeout(4000);
+  await expect(uploadedFile).toBeVisible({ timeout: 15000 });
+  console.log("🎉 File upload persisted successfully after Save");
+
+  // Stop recording
+  await context.tracing.stop({ path: "test-results/document-upload-trace.zip" });
+  console.log("🎥 Trace (video + DOM snapshots) saved at: test-results/document-upload-trace.zip");
+});
+
+//Test: Validate document upload flow
+
+test("Validate Document Upload - Cancel, Upload, Save & parsererror check", async ({ page, context }) => {
+  await context.tracing.start({ screenshots: true, snapshots: true });
+
+  await login(page);
+  await openMyProfile(page);
+  const docTab = page.locator('a[data-toggle="tab"][href="#tabDocumentUpload"]');
+  await expect(docTab).toBeVisible();
+  await docTab.click();
+  console.log(" Opened Documents Upload tab");
+
+  //  Enable Edit mode
+  const editBtn = page.locator("#btnEdit");
+  await expect(editBtn).toBeVisible({ timeout: 10000 });
+  await editBtn.click();
+  console.log(" Clicked Edit to enable upload");
+
+  //  Cancel upload first
+  const cancelBtn = page.locator("#btnCancel");
+  await expect(cancelBtn).toBeVisible();
+  await cancelBtn.click();
+  console.log(" Clicked Cancel — exited upload mode");
+
+  // Re-enter Edit mode
+  await editBtn.click();
+  console.log(" Re-entered edit mode for upload");
+
+  //  Upload a file
+  const filePath = path.resolve("tests/files/sample.pdf");
+  console.log(` File selected for upload: ${filePath}`);
+
+  // Make file input visible (Dropzone hides it)
+  await page.evaluate(() => {
+    const input = document.querySelector('input[type="file"][multiple]');
+    if (input) input.style.display = "block";
+  });
+
+  const uploadInput = page.locator('input[type="file"][multiple]');
+  await uploadInput.setInputFiles(filePath);
+  console.log(" File uploaded via Dropzone input");
+
+  //  Wait until upload is finished
+  const uploadStatus = page.locator("#DocumentUploadInProcess");
+  console.log("⏳ Waiting for upload to finish...");
+  await expect(uploadStatus).toHaveValue("0", { timeout: 30000 });
+  console.log("Upload process completed");
+
+  //  Verify uploaded file preview
+  const uploadedFile = page.locator(".dz-filename span", { hasText: "sample.pdf" }).first();
+  await expect(uploadedFile).toBeVisible({ timeout: 15000 });
+  console.log(" Uploaded file preview visible");
+
+  //  Select document type
+  const docTypeDropdown = page.locator(".joiningDocumentSelect").first();
+  await expect(docTypeDropdown).toBeVisible();
+  await docTypeDropdown.selectOption({ label: "Aadhaar Card" });
+  console.log("Selected document type: Aadhaar Card");
+
+  //  Click Save
+  const saveBtn = page.locator("#btnSave");
+  await expect(saveBtn).toBeVisible();
+  await saveBtn.click();
+  console.log("Clicked Save button to confirm upload");
+
+  //  Wait for notification popup
+  const notification = page.locator(".gritter-item");
+  await notification.first().waitFor({ timeout: 15000 });
+  console.log(" Notification appeared after Save");
+
+  // Extract message text
+  const title = await notification.locator(".gritter-title").textContent();
+  const message = await notification.locator("p").textContent();
+  console.log(` Notification Title: "${title?.trim()}"`);
+  console.log(` Notification Message: "${message?.trim()}"`);
+
+  // Validate message
+  if (message?.toLowerCase().includes("parsererror")) {
+    console.error(" Parsererror detected — backend save failed");
+    await page.screenshot({ path: "test-results/parsererror_detected.png" });
+    throw new Error("Upload failed: parsererror shown in notification");
+  } else {
+    console.log("Upload succeeded — no parsererror detected");
+  }
+
+});
 
