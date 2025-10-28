@@ -169,29 +169,29 @@ test.only('Validate Assets tab Save - should not show parsererror', async ({ pag
   const assetsTab = page.locator('a[data-toggle="tab"][href="#tabAssets"]');
   await expect(assetsTab).toBeVisible({ timeout: 10000 });
   await assetsTab.click();
-  console.log('✅ Opened Assets tab');
+  console.log(' Opened Assets tab');
 
   // Wait for table to load
   const assetsTable = page.locator('#datatableAssets');
   await expect(assetsTable).toBeVisible({ timeout: 10000 });
-  console.log('✅ Assets table loaded');
+  console.log(' Assets table loaded');
 
   // Click Edit button
   const editButton = page.locator('#btnEdit');
   await expect(editButton).toBeVisible({ timeout: 10000 });
   await editButton.click();
-  console.log('✅ Clicked Edit');
+  console.log(' Clicked Edit');
 
   // Check Save & Cancel buttons
   const saveButton = page.locator('#btnSave');
   const cancelButton = page.locator('#btnCancel');
   await expect(saveButton).toBeVisible({ timeout: 5000 });
   await expect(cancelButton).toBeVisible({ timeout: 5000 });
-  console.log('✅ Save & Cancel buttons visible');
+  console.log(' Save & Cancel buttons visible');
 
   // Click Save
   await saveButton.click();
-  console.log('💾 Clicked Save button');
+  console.log(' Clicked Save button');
 
   // Wait for notification and ensure parsererror does not appear
   const gritterTitle = page.locator('.gritter-without-image .gritter-title');
@@ -206,12 +206,12 @@ test.only('Validate Assets tab Save - should not show parsererror', async ({ pag
   );
 
   const messageText = (await gritterMessage.textContent())?.trim() || '';
-  console.log(`📢 Notification Title: "${await gritterTitle.textContent()}"`);
-  console.log(`📩 Notification Message: "${messageText}"`);
+  console.log(` Notification Title: "${await gritterTitle.textContent()}"`);
+  console.log(` Notification Message: "${messageText}"`);
 
   // Assertion to ensure parsererror does not appear
   expect(messageText.toLowerCase()).not.toContain('parsererror');
-  console.log('✅ Notification does not show parsererror — Save successful!');
+  console.log(' Notification does not show parsererror — Save successful!');
 });
 
 // --------------------------
@@ -232,7 +232,7 @@ test('Academic Qualification: Edit all rows', async ({ page }) => {
     const row = rows.nth(i);
     await row.locator('button.actionEdit').click();
 
-    // ✅ Specific modal for Academic Qualification
+    //  Specific modal for Academic Qualification
     const modal = page.locator('#modal-academics .modal-dialog.add-form-container');
     await modal.waitFor({ state: 'visible' });
 
@@ -249,7 +249,7 @@ test('Academic Qualification: Edit all rows', async ({ page }) => {
     await modal.locator('button.save').click();
     await modal.waitFor({ state: 'hidden' });
 
-    console.log(`✅ Row ${i + 1} edited successfully`);
+    console.log(` Row ${i + 1} edited successfully`);
   }
 });
 
@@ -278,12 +278,12 @@ test('Academic Qualification: Delete all rows', async ({ page }) => {
     await deleteModal.getByRole('button', { name: /yes|confirm/i }).click();
     await deleteModal.waitFor({ state: 'hidden' });
 
-    console.log(`✅ Deleted a row`);
+    console.log(` Deleted a row`);
     rows = page.locator('#datatableAcademics tbody tr');
     rowCount = await rows.count();
   }
 
-  console.log('✅ All Academic Qualification rows deleted successfully');
+  console.log('All Academic Qualification rows deleted successfully');
 });
 // -------------------------------
 // TEST: Validate File Upload Flow
@@ -299,13 +299,13 @@ test('Academic Qualification: Delete all rows', async ({ page }) => {
   const docTab = page.locator('a[data-toggle="tab"][href="#tabDocumentUpload"]');
   await expect(docTab).toBeVisible();
   await docTab.click();
-  console.log("✅ Opened Documents Upload tab");
+  console.log(" Opened Documents Upload tab");
 
   // Click Edit to enable upload
   const editBtn = page.locator("#btnEdit");
   await expect(editBtn).toBeVisible({ timeout: 10000 });
   await editBtn.click();
-  console.log("✏️ Clicked Edit to enable upload");
+  console.log(" Clicked Edit to enable upload");
 
   // Handle Cancel flow
   const uploadInput = page.locator('input[type="file"][multiple]');
@@ -313,51 +313,51 @@ test('Academic Qualification: Delete all rows', async ({ page }) => {
 
   // Make sure Cancel is visible before upload
   await expect(cancelBtn).toBeVisible();
-  console.log("🚫 Cancel button visible before upload");
+  console.log(" Cancel button visible before upload");
 
   // Count files before cancel
   const uploadedFileList = page.locator(".dz-filename span");
   const initialCount = await uploadedFileList.count();
-  console.log(`📂 Files before cancel: ${initialCount}`);
+  console.log(` Files before cancel: ${initialCount}`);
 
   // Click cancel
   await cancelBtn.click();
-  console.log("🚪 Clicked Cancel - upload aborted");
+  console.log(" Clicked Cancel - upload aborted");
 
   // Ensure cancel didn’t add new files
   const countAfterCancel = await uploadedFileList.count();
   expect(countAfterCancel).toBe(initialCount);
-  console.log("✅ Cancel worked correctly — file count unchanged");
+  console.log("Cancel worked correctly — file count unchanged");
 
   // Re-enter upload mode
   await editBtn.click();
-  console.log("✏️ Re-entered edit mode for upload");
+  console.log(" Re-entered edit mode for upload");
 
   // Upload file
   const filePath = path.resolve("tests/files/sample.pdf");
-  console.log(`📄 File selected for upload: ${filePath}`);
+  console.log(` File selected for upload: ${filePath}`);
   await uploadInput.setInputFiles(filePath);
-  console.log("📤 File uploaded via Dropzone input");
+  console.log(" File uploaded via Dropzone input");
 
   // Wait for preview
   const uploadedFile = page.locator(".dz-filename span", { hasText: "sample.pdf" });
   await expect(uploadedFile).toBeVisible({ timeout: 15000 });
-  console.log("✅ Uploaded file preview visible");
+  console.log(" Uploaded file preview visible");
 
   // Click Save
   const saveBtn = page.locator("#btnSave");
   await expect(saveBtn).toBeVisible();
   await saveBtn.click();
-  console.log("💾 Clicked Save button to confirm upload");
+  console.log(" Clicked Save button to confirm upload");
 
   // Validate upload persisted
   await page.waitForTimeout(4000);
   await expect(uploadedFile).toBeVisible({ timeout: 15000 });
-  console.log("🎉 File upload persisted successfully after Save");
+  console.log(" File upload persisted successfully after Save");
 
   // Stop recording
   await context.tracing.stop({ path: "test-results/document-upload-trace.zip" });
-  console.log("🎥 Trace (video + DOM snapshots) saved at: test-results/document-upload-trace.zip");
+  console.log(" Trace (video + DOM snapshots) saved at: test-results/document-upload-trace.zip");
 });
 
 //Test: Validate document upload flow
@@ -447,3 +447,63 @@ test("Validate Document Upload - Cancel, Upload, Save & parsererror check", asyn
 
 });
 
+test("Check Previous Employment tab elements visibility", async ({ page }) => {
+  // Step 1: Login and open My Profile
+  await login(page);
+  await openMyProfile(page);
+  console.log(" Logged in & opened My Profile");
+
+  //  Click Edit to enable editing
+  const editButton = page.locator("#btnEdit");
+  await expect(editButton).toBeVisible({ timeout: 10000 });
+  await editButton.click();
+  console.log(" Clicked Edit — edit mode enabled");
+
+  //  Go to Previous Employment tab
+  const prevEmploymentTab = page.locator('a[href="#tabPreviousEmployment"]');
+  await expect(prevEmploymentTab).toBeVisible();
+  await prevEmploymentTab.click();
+  console.log("Switched to Previous Employment tab");
+
+  // Check Add button visibility
+  const addButton = page.locator("#addPreviousEmployment");
+  await expect(addButton).toBeVisible();
+  console.log(" Add button visible");
+
+  //  Check table visibility and headers
+  const table = page.locator("#datatablePreviousEmployments");
+  await expect(table).toBeVisible();
+  await expect(page.locator("th", { hasText: "Organization" })).toBeVisible();
+  await expect(page.locator("th", { hasText: "Designation" })).toBeVisible();
+  await expect(page.locator("th", { hasText: "From Date" })).toBeVisible();
+  await expect(page.locator("th", { hasText: "To Date" })).toBeVisible();
+  await expect(page.locator("th", { hasText: "Remarks" })).toBeVisible();
+  console.log(" Verified table and headers are visible");
+
+  //  Open modal
+  await addButton.click();
+  const modal = page.locator(".modal:visible");
+  await expect(modal.locator("h4.blue.bigger")).toHaveText("Previous Employment", { timeout: 10000 });
+  console.log("Modal opened successfully");
+
+  //  Verify modal input fields visibility
+  await expect(modal.locator("#Organization")).toBeVisible();
+  await expect(modal.locator("#Designation")).toBeVisible();
+  await expect(modal.locator("#FromDate")).toBeVisible();
+  await expect(modal.locator("#ToDate")).toBeVisible();
+  await expect(modal.locator("#YearOfExperience")).toBeVisible();
+  await expect(modal.locator("#RelevantExperience")).toBeVisible();
+  await expect(modal.locator("#Remarks")).toBeVisible();
+  await expect(modal.locator("#Salary")).toBeVisible();
+  console.log(" All modal fields visible");
+
+  // Verify buttons in modal
+  await expect(modal.locator("button.save")).toBeVisible();
+  await expect(modal.locator("button.reset")).toBeVisible();
+  console.log("💾 Save and Cancel buttons visible");
+
+  // Close modal
+  await modal.locator('button[data-dismiss="modal"]').click();
+  await expect(modal).toBeHidden({ timeout: 10000 });
+  console.log(" Modal closed successfully");
+});
