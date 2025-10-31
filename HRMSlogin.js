@@ -1,10 +1,6 @@
-// pages/LoginPage.js
-import { expect } from '@playwright/test';
 
+import { expect } from '@playwright/test';
 export class LoginPage {
-  /**
-   * @param {import('@playwright/test').Page} page
-   */
   constructor(page) {
     this.page = page;
     this.loginBox = page.locator('#login-box');
@@ -30,6 +26,7 @@ export class LoginPage {
   async verifyLoginSuccess() {
     await this.page.waitForURL('**/Home'); // Wait until home page after login
     await expect(this.page).toHaveTitle(/Employee Information Portal/i);
-    console.log('✅ Login successful and homepage loaded.');
+    console.log('Login successful and homepage loaded.');
   }
 }
+
