@@ -1,9 +1,7 @@
-// orangehrm.spec.js
+
 const { test, expect } = require('@playwright/test');
 
 let page;
-
-// ============ HOOKS ============
 
 // Runs once before all tests
 test.beforeAll(async ({ browser }) => {
@@ -31,8 +29,6 @@ test.afterEach(async () => {
   console.log(">>> After Test Execution <<<");
 });
 
-// ============ TEST CASE ============
-
 test('Login with valid credentials', async () => {
   await page.fill('input[name="username"]', 'Admin');
   await page.fill('input[name="password"]', 'admin123');
@@ -42,3 +38,4 @@ test('Login with valid credentials', async () => {
   const header = await page.textContent('h6.oxd-topbar-header-breadcrumb-module');
   await expect(header).toBe('Dashboard');
 });
+
