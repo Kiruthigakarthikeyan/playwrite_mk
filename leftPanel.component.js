@@ -149,7 +149,7 @@ export class LeftPanel {
     await panelLocator.scrollIntoViewIfNeeded();
     await panelLocator.click();
 
-    // Wait briefly for modal to appear
+    // Wait for modal
     const modalVisible = await this.page.waitForSelector(
       '.modal.fade.in, .modal.show, #ModulesModal',
       { timeout: 3000 }
@@ -159,10 +159,10 @@ export class LeftPanel {
       // Verify all expected texts
       for (const text of item.expectedText) {
         await expect(this.messageBox).toContainText(text, { timeout: 5000 });
-        console.log(`   🔹 Verified text: "${text}"`);
+        console.log('Verified text: "${text}"');
       }
 
-      // Only click close button if it is visible
+      // click close button if it is visible
       const closeBtnVisible = await this.closeButton.isVisible().catch(() => false);
       if (closeBtnVisible) {
         const closeBtnHandle = await this.closeButton.elementHandle();
@@ -174,19 +174,20 @@ export class LeftPanel {
           );
         }
       } else {
-        console.log(`   ⚠️ Close button not visible for panel item: ${item.name}`);
+        console.log('Close button not visible for panel item: ${item.name}');
       }
     } else {
-      console.log(`   ⚠️ No modal appeared for panel item: ${item.name}`);
+      console.log('No modal appeared for panel item: ${item.name}');
     }
   }
 
   async validateAllPanelItems() {
-    console.log(`🔹 Found ${this.panelItems.length} left-panel items`);
+    console.log('Found ${this.panelItems.length} left-panel items');
     for (const item of this.panelItems) {
-      console.log(`🔹 Checking panel item: ${item.name}`);
+      console.log('Checking panel item: ${item.name}');
       await this.clickItemAndCheckMessage(item);
     }
   }
 }
+
 
