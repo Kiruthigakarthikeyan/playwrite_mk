@@ -28,9 +28,10 @@ test.describe('Playwright Frames Handling', () => {
     const childText = await childFrame.locator('p').textContent();
     console.log('Child Frame Text:', childText);
 
-    // ✅ Assertions
+    // Assertions
     await expect(parentFrame.locator('body')).toContainText('Parent frame');
     await expect(childFrame.locator('p')).toHaveText('Child Iframe');
   });
 
 });
+
