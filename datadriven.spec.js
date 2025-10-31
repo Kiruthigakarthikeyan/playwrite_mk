@@ -21,9 +21,8 @@ test.describe('Data-driven login tests', () => {
       await page.fill('#user-name', login.username);
       await page.fill('#password', login.password);
       await page.click('#login-button');
-
-      // Optional assertion (adjust as needed)
       await expect(page).toHaveURL(/saucedemo/);
     });
   }
 });
+
